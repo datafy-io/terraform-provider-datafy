@@ -3,10 +3,13 @@ package account
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -17,10 +20,13 @@ func NewResource() resource.Resource {
 }
 
 type Resource struct {
-	client *http.Client
+	client *datafy.Client
 }
 
 type ResourceModel struct {
+	Name            types.String `tfsdk:"name"`
+	Id              types.String `tfsdk:"id"`
+	ParentAccountId types.String `tfsdk:"parent_account_id"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -29,8 +35,24 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Datafy account",
-		Attributes:          map[string]schema.Attribute{},
+		Description: "Datafy account",
+		Attributes: map[string]schema.Attribute{
+			"name": schema.StringAttribute{
+				Description: "account name",
+				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"id": schema.StringAttribute{
+				Description: "account id",
+				Computed:    true,
+			},
+			"parentAccountId": schema.StringAttribute{
+				Description: "parent account id",
+				Computed:    true,
+			},
+		},
 	}
 }
 
@@ -40,11 +62,11 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 		return
 	}
 
-	client, ok := req.ProviderData.(*http.Client)
+	client, ok := req.ProviderData.(*datafy.Client)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *datafy.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -54,43 +76,73 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 }
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var data ResourceModel
+	var plan ResourceModel
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	car, err := r.client.CreateAccount(ctx, &datafy.CreateAccountRequest{
+		AccountName: plan.Name.String(),
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error creating account",
+			"Could not create account: "+err.Error(),
+		)
+		return
+	}
+
+	plan.Id = types.StringValue(car.Account.AccountId)
+	plan.ParentAccountId = types.StringValue(car.Account.ParentAccountId)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data ResourceModel
+	var state ResourceModel
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	gcr, err := r.client.GetAccount(ctx, &datafy.GetAccountRequest{
+		AccountId: state.Id.ValueString(),
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error read account",
+			"Could not read account: "+err.Error(),
+		)
+		return
+	}
+
+	state.Name = types.StringValue(gcr.Account.AccountName)
+	state.ParentAccountId = types.StringValue(gcr.Account.ParentAccountId)
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data ResourceModel
+}
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var state ResourceModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data ResourceModel
-
-	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	if resp.Diagnostics.HasError() {
+	_, err := r.client.DeleteAccount(ctx, &datafy.DeleteAccountRequest{
+		AccountId: state.Id.ValueString(),
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error delete account",
+			"Could not delete account: "+err.Error(),
+		)
 		return
 	}
 }
