@@ -38,6 +38,10 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "account id",
 				Required:    true,
 			},
+			"arn": schema.StringAttribute{
+				Description: "account role arn",
+				Computed:    true,
+			},
 		},
 	}
 }

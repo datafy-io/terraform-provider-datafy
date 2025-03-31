@@ -47,6 +47,25 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "account token id",
 				Required:    true,
 			},
+			"description": schema.StringAttribute{
+				Description: "account token description",
+				Computed:    true,
+			},
+			"role_ids": schema.ListAttribute{
+				Description: "account token role ids",
+				ElementType: types.StringType,
+				Computed:    true,
+			},
+			"expires": schema.StringAttribute{
+				CustomType:  timetypes.RFC3339Type{},
+				Description: "time the account token will expire",
+				Computed:    true,
+			},
+			"created_at": schema.StringAttribute{
+				CustomType:  timetypes.RFC3339Type{},
+				Description: "time the account token was created",
+				Computed:    true,
+			},
 		},
 	}
 }

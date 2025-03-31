@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 	"fmt"
-
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -38,6 +37,14 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"id": schema.StringAttribute{
 				Description: "account id",
 				Required:    true,
+			},
+			"name": schema.StringAttribute{
+				Description: "account name",
+				Computed:    true,
+			},
+			"parent_account_id": schema.StringAttribute{
+				Description: "parent account id",
+				Computed:    true,
 			},
 		},
 	}
