@@ -1,4 +1,4 @@
-default: fmt install
+default: fmt install generate
 
 .PHONY: build
 build:
@@ -7,6 +7,10 @@ build:
 .PHONY: install
 install: build
 	go install -v ./...
+
+.PHONY: generate
+generate:
+	cd tools; go generate ./...
 
 .PHONY: fmt
 fmt:
