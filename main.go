@@ -1,5 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-
 package main
 
 import (
@@ -8,11 +6,8 @@ import (
 	"log"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/provider"
+	"github.com/datafy-io/terraform-provider-datafy/version"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-)
-
-var (
-	version string = "dev"
 )
 
 func main() {
@@ -26,7 +21,7 @@ func main() {
 		Debug:   debug,
 	}
 
-	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	err := providerserver.Serve(context.Background(), provider.New(version.ProviderVersion), opts)
 
 	if err != nil {
 		log.Fatal(err.Error())
