@@ -15,5 +15,3 @@ fmt:
 .PHONY: test
 test:
 	go test -v -cover -timeout=120s -parallel=10 ./...
-
-
