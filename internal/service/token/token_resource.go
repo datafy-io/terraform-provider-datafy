@@ -3,12 +3,13 @@ package token
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"time"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -29,12 +30,12 @@ type ResourceModel struct {
 	Ttl         timetypes.GoDuration `tfsdk:"ttl"`
 	RoleIds     types.List           `tfsdk:"role_ids"`
 	Secret      types.String         `tfsdk:"secret"`
-	Expires     timetypes.RFC3339    `json:"expires"`
-	CreatedAt   timetypes.RFC3339    `json:"created_at"`
+	Expires     timetypes.RFC3339    `tfsdk:"expires"`
+	CreatedAt   timetypes.RFC3339    `tfsdk:"created_at"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "token"
+	resp.TypeName = req.ProviderTypeName + "_token"
 }
 
 func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
@@ -120,7 +121,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	}
 
 	catr, err := r.client.CreateAccountToken(ctx, &datafy.CreateAccountTokenRequest{
-		AccountId:   plan.AccountId.String(),
+		AccountId:   plan.AccountId.ValueString(),
 		Description: plan.Description.ValueString(),
 		Ttl: func() time.Duration {
 			d, _ := time.ParseDuration(plan.Ttl.ValueString())
@@ -199,6 +200,7 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp 
 
 	_, err := r.client.DeleteAccountToken(ctx, &datafy.DeleteAccountTokenRequest{
 		AccountId: state.AccountId.ValueString(),
+		TokenId:   state.TokenId.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(

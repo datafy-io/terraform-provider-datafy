@@ -81,19 +81,14 @@ func (p *DatafyProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	if !config.Endpoint.IsNull() {
 		datafyEndpoint = config.Endpoint.ValueString()
 	}
+	if datafyEndpoint == "" {
+		datafyEndpoint = "https://api.datafy.io"
+	}
 
 	if datafyToken == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("token"),
 			"Missing Token",
-			"Cannot create Datafy Provider as there is a missing or empty value.",
-		)
-	}
-
-	if datafyEndpoint == "" {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("endpoint"),
-			"Missing Endpoint",
 			"Cannot create Datafy Provider as there is a missing or empty value.",
 		)
 	}

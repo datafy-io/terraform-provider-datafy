@@ -48,7 +48,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "account id",
 				Computed:    true,
 			},
-			"parentAccountId": schema.StringAttribute{
+			"parent_account_id": schema.StringAttribute{
 				Description: "parent account id",
 				Computed:    true,
 			},
@@ -84,7 +84,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	}
 
 	car, err := r.client.CreateAccount(ctx, &datafy.CreateAccountRequest{
-		AccountName: plan.Name.String(),
+		AccountName: plan.Name.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(

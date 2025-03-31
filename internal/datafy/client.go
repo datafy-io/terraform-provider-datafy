@@ -183,7 +183,7 @@ func (c *Client) DeleteAccountRoleArn(ctx context.Context, req *DeleteAccountRol
 }
 
 func (c *Client) CreateAccountToken(ctx context.Context, req *CreateAccountTokenRequest) (*CreateAccountTokenResponse, error) {
-	resp, err := c.callAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/accounts/%s/token", req.AccountId), nil, map[string]interface{}{
+	resp, err := c.callAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/accounts/%s/tokens", req.AccountId), nil, map[string]interface{}{
 		"description":     req.Description,
 		"expireInMinutes": int(req.Ttl.Minutes()),
 		"roleIds":         req.RoleIds,
@@ -208,7 +208,7 @@ func (c *Client) CreateAccountToken(ctx context.Context, req *CreateAccountToken
 }
 
 func (c *Client) GetAccountToken(ctx context.Context, req *GetAccountTokenRequest) (*GetAccountTokenResponse, error) {
-	resp, err := c.callAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%s/token", req.AccountId), nil, nil)
+	resp, err := c.callAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%s/tokens/%s", req.AccountId, req.TokenId), nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (c *Client) GetAccountToken(ctx context.Context, req *GetAccountTokenReques
 }
 
 func (c *Client) DeleteAccountToken(ctx context.Context, req *DeleteAccountTokenRequest) (*DeleteAccountTokenResponse, error) {
-	resp, err := c.callAPI(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/accounts/%s/token", req.AccountId), nil, nil)
+	resp, err := c.callAPI(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/accounts/%s/tokens/%s", req.AccountId, req.TokenId), nil, nil)
 	if err != nil {
 		return nil, err
 	}

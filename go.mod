@@ -1,6 +1,6 @@
 module github.com/datafy-io/terraform-provider-datafy
 
-go 1.24
+go 1.23
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.14.1

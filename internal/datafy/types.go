@@ -92,6 +92,7 @@ type GetAccountTokenResponse struct {
 
 type DeleteAccountTokenRequest struct {
 	AccountId string
+	TokenId   string
 }
 
 type DeleteAccountTokenResponse struct {

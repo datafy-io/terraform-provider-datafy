@@ -73,9 +73,9 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
-	carar, err := r.client.CreateAccountRoleArn(ctx, &datafy.CreateAccountRoleArnRequest{
-		AccountId: plan.AccountId.String(),
-		Arn:       plan.Arn.String(),
+	_, err := r.client.CreateAccountRoleArn(ctx, &datafy.CreateAccountRoleArnRequest{
+		AccountId: plan.AccountId.ValueString(),
+		Arn:       plan.Arn.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -85,7 +85,6 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
-	plan.Arn = types.StringValue(carar.AccountRoleArn.RoleArn)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
