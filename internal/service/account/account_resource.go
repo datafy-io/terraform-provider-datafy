@@ -35,21 +35,21 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Datafy account",
+		Description: "Create a Datafy account",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
-				Description: "account name",
+				Description: "The name of the Datafy account.",
 				Required:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"id": schema.StringAttribute{
-				Description: "account id",
+				Description: "The unique identifier of the Datafy account.",
 				Computed:    true,
 			},
 			"parent_account_id": schema.StringAttribute{
-				Description: "parent account id",
+				Description: "The unique identifier of the parent Datafy account",
 				Computed:    true,
 			},
 		},

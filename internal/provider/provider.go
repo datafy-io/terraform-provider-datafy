@@ -42,7 +42,8 @@ func (p *DatafyProvider) Schema(ctx context.Context, req provider.SchemaRequest,
 				Sensitive:   true,
 			},
 			"endpoint": schema.StringAttribute{
-				Optional: true,
+				Description: "Datafy endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.",
+				Optional:    true,
 			},
 		},
 	}

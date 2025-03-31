@@ -3,12 +3,12 @@
 page_title: "datafy_account Resource - datafy"
 subcategory: ""
 description: |-
-  Datafy account
+  Create a Datafy account
 ---
 
 # datafy_account (Resource)
 
-Datafy account
+Create a Datafy account
 
 ## Example Usage
 
@@ -23,9 +23,9 @@ resource "datafy_account" "example" {
 
 ### Required
 
-- `name` (String) account name
+- `name` (String) The name of the Datafy account.
 
 ### Read-Only
 
-- `id` (String) account id
-- `parent_account_id` (String) parent account id
+- `id` (String) The unique identifier of the Datafy account.
+- `parent_account_id` (String) The unique identifier of the parent Datafy account

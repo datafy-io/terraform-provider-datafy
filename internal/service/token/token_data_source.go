@@ -37,33 +37,33 @@ func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataReques
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Datafy token data source",
+		Description: "Retrieves a specific Datafy token.",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "account id",
+				Description: "The unique identifier of the Datafy account.",
 				Required:    true,
 			},
 			"token_id": schema.StringAttribute{
-				Description: "account token id",
+				Description: "The unique identifier of the Datafy token.",
 				Required:    true,
 			},
 			"description": schema.StringAttribute{
-				Description: "account token description",
+				Description: "A description of the token.",
 				Computed:    true,
 			},
 			"role_ids": schema.ListAttribute{
-				Description: "account token role ids",
+				Description: "A list of role IDs associated with the token.",
 				ElementType: types.StringType,
 				Computed:    true,
 			},
 			"expires": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "time the account token will expire",
+				Description: "The time when the token will expire.",
 				Computed:    true,
 			},
 			"created_at": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "time the account token was created",
+				Description: "The time when the token was created.",
 				Computed:    true,
 			},
 		},

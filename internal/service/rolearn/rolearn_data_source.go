@@ -32,14 +32,14 @@ func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataReques
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Datafy account role ARN data source",
+		Description: "Retrieves a specific Datafy role ARN.",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "account id",
+				Description: "The unique identifier of the Datafy account.",
 				Required:    true,
 			},
 			"arn": schema.StringAttribute{
-				Description: "account role arn",
+				Description: "The Amazon Resource Name (ARN) of the IAM role.",
 				Computed:    true,
 			},
 		},

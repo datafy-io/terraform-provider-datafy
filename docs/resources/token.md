@@ -3,12 +3,12 @@
 page_title: "datafy_token Resource - datafy"
 subcategory: ""
 description: |-
-  Datafy account token
+  Create a Datafy token, which represents an access token associated with a Datafy account.
 ---
 
 # datafy_token (Resource)
 
-Datafy account token
+Create a Datafy token, which represents an access token associated with a Datafy account.
 
 ## Example Usage
 
@@ -26,17 +26,17 @@ resource "datafy_token" "example" {
 
 ### Required
 
-- `account_id` (String) account id
-- `role_ids` (List of String) account token role ids
+- `account_id` (String) The unique identifier of the Datafy account.
+- `role_ids` (List of String) A list of role IDs associated with the token.
 
 ### Optional
 
-- `description` (String) account token description
-- `ttl` (String) account token ttl
+- `description` (String) A description of the token.
+- `ttl` (String) The expiration time of the token.
 
 ### Read-Only
 
-- `created_at` (String) time the account token was created
-- `expires` (String) time the account token will expire
-- `secret` (String, Sensitive) account token
-- `token_id` (String) account token id
+- `created_at` (String) The time when the token was created.
+- `expires` (String) The time when the token will expire.
+- `secret` (String, Sensitive) The secret value of the token.
+- `token_id` (String) The unique identifier of the Datafy token.

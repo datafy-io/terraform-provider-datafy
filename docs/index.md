@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 provider "datafy" {
-  token = "eZa0qICnUV-COvO46NfDysUD4DGmZvdtTLht5shNN4bFKMeWssXVCIsIIn0.eyJzdW"
+  token = "eZa0qICnUV-COvO46NfDysUDN4bFKMeWssXVCIsIIn0.eyJzdW"
 }
 ```
 
@@ -23,5 +23,5 @@ provider "datafy" {
 
 ### Optional
 
-- `endpoint` (String)
+- `endpoint` (String) Datafy endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.
 - `token` (String, Sensitive) Datafy token. Can also be configured using the `DATAFY_TOKEN` environment variable.

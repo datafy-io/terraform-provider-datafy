@@ -3,12 +3,12 @@
 page_title: "datafy_token Data Source - datafy"
 subcategory: ""
 description: |-
-  Datafy token data source
+  Retrieves a specific Datafy token.
 ---
 
 # datafy_token (Data Source)
 
-Datafy token data source
+Retrieves a specific Datafy token.
 
 ## Example Usage
 
@@ -24,12 +24,12 @@ data "datafy_token" "example" {
 
 ### Required
 
-- `account_id` (String) account id
-- `token_id` (String) account token id
+- `account_id` (String) The unique identifier of the Datafy account.
+- `token_id` (String) The unique identifier of the Datafy token.
 
 ### Read-Only
 
-- `created_at` (String) time the account token was created
-- `description` (String) account token description
-- `expires` (String) time the account token will expire
-- `role_ids` (List of String) account token role ids
+- `created_at` (String) The time when the token was created.
+- `description` (String) A description of the token.
+- `expires` (String) The time when the token will expire.
+- `role_ids` (List of String) A list of role IDs associated with the token.

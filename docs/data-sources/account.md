@@ -3,12 +3,12 @@
 page_title: "datafy_account Data Source - datafy"
 subcategory: ""
 description: |-
-  Datafy account data source
+  Retrieves a specific Datafy account.
 ---
 
 # datafy_account (Data Source)
 
-Datafy account data source
+Retrieves a specific Datafy account.
 
 ## Example Usage
 
@@ -23,9 +23,9 @@ data "datafy_account" "example" {
 
 ### Required
 
-- `id` (String) account id
+- `id` (String) The unique identifier of the account.
 
 ### Read-Only
 
-- `name` (String) account name
-- `parent_account_id` (String) parent account id
+- `name` (String) The name of the account.
+- `parent_account_id` (String) The unique identifier of the parent account

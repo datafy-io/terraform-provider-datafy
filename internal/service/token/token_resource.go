@@ -44,43 +44,43 @@ func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConf
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Datafy account token",
+		Description: "Create a Datafy token, which represents an access token associated with a Datafy account.",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "account id",
+				Description: "The unique identifier of the Datafy account.",
 				Required:    true,
 			},
 			"description": schema.StringAttribute{
-				Description: "account token description",
+				Description: "A description of the token.",
 				Optional:    true,
 			},
 			"ttl": schema.StringAttribute{
 				CustomType:  timetypes.GoDurationType{},
-				Description: "account token ttl",
+				Description: "The expiration time of the token.",
 				Optional:    true,
 			},
 			"role_ids": schema.ListAttribute{
-				Description: "account token role ids",
+				Description: "A list of role IDs associated with the token.",
 				ElementType: types.StringType,
 				Required:    true,
 			},
 			"secret": schema.StringAttribute{
-				Description: "account token",
+				Description: "The secret value of the token.",
 				Computed:    true,
 				Sensitive:   true,
 			},
 			"token_id": schema.StringAttribute{
-				Description: "account token id",
+				Description: "The unique identifier of the Datafy token.",
 				Computed:    true,
 			},
 			"expires": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "time the account token will expire",
+				Description: "The time when the token will expire.",
 				Computed:    true,
 			},
 			"created_at": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "time the account token was created",
+				Description: "The time when the token was created.",
 				Computed:    true,
 			},
 		},

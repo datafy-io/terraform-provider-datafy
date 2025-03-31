@@ -32,18 +32,18 @@ func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataReques
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Datafy account data source",
+		Description: "Retrieves a specific Datafy account.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "account id",
+				Description: "The unique identifier of the account.",
 				Required:    true,
 			},
 			"name": schema.StringAttribute{
-				Description: "account name",
+				Description: "The name of the account.",
 				Computed:    true,
 			},
 			"parent_account_id": schema.StringAttribute{
-				Description: "parent account id",
+				Description: "The unique identifier of the parent account",
 				Computed:    true,
 			},
 		},
