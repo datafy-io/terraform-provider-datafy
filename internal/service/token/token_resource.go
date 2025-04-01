@@ -3,6 +3,9 @@ package token
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"time"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
@@ -49,20 +52,32 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
 				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"description": schema.StringAttribute{
 				Description: "A description of the token.",
 				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"ttl": schema.StringAttribute{
 				CustomType:  timetypes.GoDurationType{},
 				Description: "The expiration time of the token.",
 				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"role_ids": schema.ListAttribute{
 				Description: "A list of role IDs associated with the token.",
 				ElementType: types.StringType,
 				Required:    true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(),
+				},
 			},
 			"secret": schema.StringAttribute{
 				Description: "The secret value of the token.",
