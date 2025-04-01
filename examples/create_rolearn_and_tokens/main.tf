@@ -6,6 +6,10 @@ terraform {
   }
 }
 
+provider "datafy" {
+  token = "eZa0qICnUV-COvO46NfDysUDN4bFKMeWssXVCIsIIn0.eyJzdW"
+}
+
 resource "datafy_account" "example" {
   name = "example-account"
 }
@@ -16,10 +20,10 @@ resource "datafy_role_arn" "example" {
 }
 
 resource "datafy_token" "with_expiration" {
-  account_id        = datafy_account.example.id
-  description       = "Token with expiration"
-  expire_in_minutes = 60
-  role_ids          = ["role1", "role2"]
+  account_id  = datafy_account.example.id
+  description = "Token with expiration"
+  ttl         = "60m"
+  role_ids    = ["role1", "role2"]
 }
 
 resource "datafy_token" "no_expiration" {
