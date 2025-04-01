@@ -159,6 +159,7 @@ func (c *Client) GetAccountRoleArn(ctx context.Context, req *GetAccountRoleArnRe
 func (c *Client) UpdateAccountRoleArn(ctx context.Context, req *UpdateAccountRoleArnRequest) (*UpdateAccountRoleArnResponse, error) {
 	res, err := c.CreateAccountRoleArn(ctx, &CreateAccountRoleArnRequest{
 		AccountId: req.AccountId,
+		Arn:       req.Arn,
 	})
 	if err != nil {
 		return nil, err
