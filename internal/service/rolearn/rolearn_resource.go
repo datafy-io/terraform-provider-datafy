@@ -120,7 +120,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		return
 	}
 
-	uarar, err := r.client.UpdateAccountRoleArn(ctx, &datafy.UpdateAccountRoleArnRequest{
+	_, err := r.client.UpdateAccountRoleArn(ctx, &datafy.UpdateAccountRoleArnRequest{
 		AccountId: plan.AccountId.ValueString(),
 		Arn:       plan.Arn.ValueString(),
 	})
@@ -131,8 +131,6 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		)
 		return
 	}
-
-	plan.Arn = types.StringValue(uarar.AccountRoleArn.RoleArn)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
