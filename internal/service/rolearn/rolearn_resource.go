@@ -121,8 +121,8 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 	}
 
 	uarar, err := r.client.UpdateAccountRoleArn(ctx, &datafy.UpdateAccountRoleArnRequest{
-		AccountId: plan.AccountId.String(),
-		Arn:       plan.Arn.String(),
+		AccountId: plan.AccountId.ValueString(),
+		Arn:       plan.Arn.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
