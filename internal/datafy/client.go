@@ -77,6 +77,29 @@ func (c *Client) CreateAccount(ctx context.Context, req *CreateAccountRequest) (
 	}, nil
 }
 
+func (c *Client) UpdateAccount(ctx context.Context, req *UpdateAccountRequest) (*UpdateAccountResponse, error) {
+	resp, err := c.callAPI(ctx, http.MethodPut, "/api/v1/accounts/"+req.AccountId, nil, map[string]interface{}{
+		"name": req.AccountName,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, toError(resp)
+	}
+
+	var account Account
+	if err := json.NewDecoder(resp.Body).Decode(&account); err != nil {
+		return nil, err
+	}
+
+	return &UpdateAccountResponse{
+		Account: account,
+	}, nil
+}
+
 func (c *Client) GetAccount(ctx context.Context, req *GetAccountRequest) (*GetAccountResponse, error) {
 	resp, err := c.callAPI(ctx, http.MethodGet, "/api/v1/accounts/"+req.AccountId, nil, nil)
 	if err != nil {

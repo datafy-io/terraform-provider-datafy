@@ -7,8 +7,6 @@ import (
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -40,9 +38,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"name": schema.StringAttribute{
 				Description: "The name of the Datafy account.",
 				Required:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
@@ -125,6 +120,26 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 }
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan ResourceModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	_, err := r.client.UpdateAccount(ctx, &datafy.UpdateAccountRequest{
+		AccountId:   plan.Id.ValueString(),
+		AccountName: plan.Name.ValueString(),
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error update account",
+			"Could not update account: "+err.Error(),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
