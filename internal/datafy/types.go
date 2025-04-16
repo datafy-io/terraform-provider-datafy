@@ -12,6 +12,15 @@ type CreateAccountResponse struct {
 	Account Account
 }
 
+type UpdateAccountRequest struct {
+	AccountId   string
+	AccountName string
+}
+
+type UpdateAccountResponse struct {
+	Account Account
+}
+
 type GetAccountRequest struct {
 	AccountId string
 }
