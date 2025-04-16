@@ -7,6 +7,8 @@ import (
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -42,10 +44,16 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"parent_account_id": schema.StringAttribute{
 				Description: "The unique identifier of the parent Datafy account",
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
