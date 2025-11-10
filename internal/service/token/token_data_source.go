@@ -3,16 +3,16 @@ package token
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &DataSource{}
+var _ datasource.DataSourceWithConfigure = &DataSource{}
 
 func NewDataSource() datasource.DataSource {
 	return &DataSource{}
