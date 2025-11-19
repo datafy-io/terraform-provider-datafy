@@ -6,6 +6,7 @@ import (
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/datafy-io/terraform-provider-datafy/internal/service/account"
+	"github.com/datafy-io/terraform-provider-datafy/internal/service/autoscaling_rule"
 	"github.com/datafy-io/terraform-provider-datafy/internal/service/rolearn"
 	"github.com/datafy-io/terraform-provider-datafy/internal/service/token"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -104,6 +105,7 @@ func (p *DatafyProvider) Resources(ctx context.Context) []func() resource.Resour
 		account.NewResource,
 		rolearn.NewResource,
 		token.NewResource,
+		autoscaling_rule.NewResource,
 	}
 }
 
@@ -112,6 +114,7 @@ func (p *DatafyProvider) DataSources(ctx context.Context) []func() datasource.Da
 		account.NewDataSource,
 		rolearn.NewDataSource,
 		token.NewDataSource,
+		autoscaling_rule.NewDataSource,
 	}
 }
 
