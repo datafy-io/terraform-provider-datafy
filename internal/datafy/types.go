@@ -116,3 +116,51 @@ type AccountToken struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	RoleIds     []string  `json:"roleIds"`
 }
+
+type CreateAccountAutoscalingRuleRequest struct {
+	AccountId string
+	Active    bool
+	Mode      string
+	Rule      string
+}
+
+type CreateAccountAutoscalingRuleResponse struct {
+	AutoscalingRule AutoscalingRule
+}
+
+type GetAccountAutoscalingRuleRequest struct {
+	AccountId string
+	RuleId    string
+}
+
+type GetAccountAutoscalingRuleResponse struct {
+	AutoscalingRule AutoscalingRule
+}
+
+type UpdateAccountAutoscalingRuleRequest struct {
+	AccountId string
+	RuleId    string
+	Active    bool
+	Mode      string
+	Rule      string
+}
+
+type UpdateAccountAutoscalingRuleResponse struct {
+	AutoscalingRule AutoscalingRule
+}
+
+type DeleteAccountAutoscalingRuleRequest struct {
+	AccountId string
+	RuleId    string
+}
+
+type DeleteAccountAutoscalingRuleResponse struct {
+}
+
+type AutoscalingRule struct {
+	AccountId string `json:"account_id"`
+	RuleId    string `json:"rule_id"`
+	Active    bool   `json:"active"`
+	Mode      string `json:"mode"`
+	Rule      string `json:"rule"`
+}
