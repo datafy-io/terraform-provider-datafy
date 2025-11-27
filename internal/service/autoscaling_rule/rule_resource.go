@@ -6,12 +6,10 @@ import (
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -30,7 +28,6 @@ type ResourceModel struct {
 	Id        types.String         `tfsdk:"id"`
 	AccountId types.String         `tfsdk:"account_id"`
 	Active    types.Bool           `tfsdk:"active"`
-	Mode      types.String         `tfsdk:"mode"`
 	Rule      jsontypes.Normalized `tfsdk:"rule"`
 }
 
@@ -59,13 +56,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"active": schema.BoolAttribute{
 				Description: "Indicates whether the autoscaling rule is active or not.",
 				Required:    true,
-			},
-			"mode": schema.StringAttribute{
-				Description: "The mode of the autoscaling rule.",
-				Required:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOf("include", "exclude"),
-				},
 			},
 			"rule": schema.StringAttribute{
 				CustomType:  jsontypes.NormalizedType{},
@@ -106,7 +96,6 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	caarr, err := r.client.CreateAccountAutoscalingRule(ctx, &datafy.CreateAccountAutoscalingRuleRequest{
 		AccountId: plan.AccountId.ValueString(),
 		Active:    plan.Active.ValueBool(),
-		Mode:      plan.Mode.ValueString(),
 		Rule:      plan.Rule.ValueString(),
 	})
 	if err != nil {
@@ -120,7 +109,6 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	plan.Id = types.StringValue(caarr.AutoscalingRule.RuleId)
 	plan.AccountId = types.StringValue(caarr.AutoscalingRule.AccountId)
 	plan.Active = types.BoolValue(caarr.AutoscalingRule.Active)
-	plan.Mode = types.StringValue(caarr.AutoscalingRule.Mode)
 	plan.Rule = jsontypes.NewNormalizedValue(caarr.AutoscalingRule.Rule)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
@@ -149,7 +137,6 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 	state.Id = types.StringValue(gaarr.AutoscalingRule.RuleId)
 	state.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
 	state.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
-	state.Mode = types.StringValue(gaarr.AutoscalingRule.Mode)
 	state.Rule = jsontypes.NewNormalizedValue(gaarr.AutoscalingRule.Rule)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -167,7 +154,6 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		AccountId: plan.AccountId.ValueString(),
 		RuleId:    plan.Id.ValueString(),
 		Active:    plan.Active.ValueBool(),
-		Mode:      plan.Mode.ValueString(),
 		Rule:      plan.Rule.ValueString(),
 	})
 	if err != nil {

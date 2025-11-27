@@ -10,7 +10,6 @@ import (
 type CreateAccountAutoscalingRuleRequest struct {
 	AccountId string
 	Active    bool
-	Mode      string
 	Rule      string
 }
 
@@ -31,7 +30,6 @@ type UpdateAccountAutoscalingRuleRequest struct {
 	AccountId string
 	RuleId    string
 	Active    bool
-	Mode      string
 	Rule      string
 }
 
@@ -58,7 +56,6 @@ type AutoscalingRule struct {
 func (c *Client) CreateAccountAutoscalingRule(ctx context.Context, req *CreateAccountAutoscalingRuleRequest) (*CreateAccountAutoscalingRuleResponse, error) {
 	resp, err := c.callAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/accounts/%s/autoscaling/rules", req.AccountId), map[string]interface{}{
 		"active": req.Active,
-		"mode":   req.Mode,
 		"rule":   req.Rule,
 	})
 	if err != nil {
@@ -104,7 +101,6 @@ func (c *Client) GetAccountAutoscalingRule(ctx context.Context, req *GetAccountA
 func (c *Client) UpdateAccountAutoscalingRule(ctx context.Context, req *UpdateAccountAutoscalingRuleRequest) (*UpdateAccountAutoscalingRuleResponse, error) {
 	resp, err := c.callAPI(ctx, http.MethodPut, fmt.Sprintf("/api/v1/accounts/%s/autoscaling/rules/%s", req.AccountId, req.RuleId), map[string]interface{}{
 		"active": req.Active,
-		"mode":   req.Mode,
 		"rule":   req.Rule,
 	})
 	if err != nil {

@@ -26,7 +26,6 @@ type DataSourceModel struct {
 	Id        types.String         `tfsdk:"id"`
 	AccountId types.String         `tfsdk:"account_id"`
 	Active    types.Bool           `tfsdk:"active"`
-	Mode      types.String         `tfsdk:"mode"`
 	Rule      jsontypes.Normalized `tfsdk:"rule"`
 }
 
@@ -92,7 +91,6 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	plan.Id = types.StringValue(gaarr.AutoscalingRule.RuleId)
 	plan.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
 	plan.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
-	plan.Mode = types.StringValue(gaarr.AutoscalingRule.Mode)
 	plan.Rule = jsontypes.NewNormalizedValue(gaarr.AutoscalingRule.Rule)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
