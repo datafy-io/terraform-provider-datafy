@@ -23,8 +23,8 @@ type DataSource struct {
 }
 
 type DataSourceModel struct {
-	Id        types.String         `tfsdk:"id"`
-	AccountId types.String         `tfsdk:"accountId"`
+	AccountId types.String         `tfsdk:"account_id"`
+	RuleId    types.String         `tfsdk:"rule_id"`
 	Active    types.Bool           `tfsdk:"active"`
 	Rule      jsontypes.Normalized `tfsdk:"rule"`
 }
@@ -37,12 +37,12 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 	resp.Schema = schema.Schema{
 		Description: "Retrieves a specific Datafy Autoscaling Rule.",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy Autoscaling Rule.",
-				Required:    true,
-			},
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
+				Required:    true,
+			},
+			"rule_id": schema.StringAttribute{
+				Description: "The unique identifier of the Datafy Autoscaling Rule.",
 				Required:    true,
 			},
 		},
@@ -78,7 +78,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	gaarr, err := d.client.GetAccountAutoscalingRule(ctx, &datafy.GetAccountAutoscalingRuleRequest{
 		AccountId: plan.AccountId.ValueString(),
-		RuleId:    plan.Id.ValueString(),
+		RuleId:    plan.RuleId.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -88,8 +88,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	plan.Id = types.StringValue(gaarr.AutoscalingRule.RuleId)
 	plan.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
+	plan.RuleId = types.StringValue(gaarr.AutoscalingRule.RuleId)
 	plan.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
 	plan.Rule = jsontypes.NewNormalizedValue(string(gaarr.AutoscalingRule.Rule))
 
