@@ -8,9 +8,9 @@ import (
 )
 
 type CreateAccountAutoscalingRuleRequest struct {
-	AccountId string
-	Active    bool
-	Rule      string
+	AccountId string          `json:"account_id"`
+	Active    bool            `json:"active"`
+	Rule      json.RawMessage `json:"rule"`
 }
 
 type CreateAccountAutoscalingRuleResponse struct {
@@ -27,10 +27,10 @@ type GetAccountAutoscalingRuleResponse struct {
 }
 
 type UpdateAccountAutoscalingRuleRequest struct {
-	AccountId string
-	RuleId    string
-	Active    bool
-	Rule      string
+	AccountId string          `json:"account_id"`
+	RuleId    string          `json:"rule_id"`
+	Active    bool            `json:"active"`
+	Rule      json.RawMessage `json:"rule"`
 }
 
 type UpdateAccountAutoscalingRuleResponse struct {
@@ -46,11 +46,10 @@ type DeleteAccountAutoscalingRuleResponse struct {
 }
 
 type AutoscalingRule struct {
-	AccountId string `json:"account_id"`
-	RuleId    string `json:"rule_id"`
-	Active    bool   `json:"active"`
-	Mode      string `json:"mode"`
-	Rule      string `json:"rule"`
+	AccountId string          `json:"accountId"`
+	RuleId    string          `json:"ruleId"`
+	Active    bool            `json:"active"`
+	Rule      json.RawMessage `json:"rule"`
 }
 
 func (c *Client) CreateAccountAutoscalingRule(ctx context.Context, req *CreateAccountAutoscalingRuleRequest) (*CreateAccountAutoscalingRuleResponse, error) {

@@ -2,6 +2,7 @@ package autoscaling_rule
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
@@ -96,7 +97,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	caarr, err := r.client.CreateAccountAutoscalingRule(ctx, &datafy.CreateAccountAutoscalingRuleRequest{
 		AccountId: plan.AccountId.ValueString(),
 		Active:    plan.Active.ValueBool(),
-		Rule:      plan.Rule.ValueString(),
+		Rule:      json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -109,7 +110,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	plan.Id = types.StringValue(caarr.AutoscalingRule.RuleId)
 	plan.AccountId = types.StringValue(caarr.AutoscalingRule.AccountId)
 	plan.Active = types.BoolValue(caarr.AutoscalingRule.Active)
-	plan.Rule = jsontypes.NewNormalizedValue(caarr.AutoscalingRule.Rule)
+	plan.Rule = jsontypes.NewNormalizedValue(string(caarr.AutoscalingRule.Rule))
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
@@ -137,7 +138,7 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 	state.Id = types.StringValue(gaarr.AutoscalingRule.RuleId)
 	state.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
 	state.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
-	state.Rule = jsontypes.NewNormalizedValue(gaarr.AutoscalingRule.Rule)
+	state.Rule = jsontypes.NewNormalizedValue(string(gaarr.AutoscalingRule.Rule))
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
@@ -154,7 +155,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		AccountId: plan.AccountId.ValueString(),
 		RuleId:    plan.Id.ValueString(),
 		Active:    plan.Active.ValueBool(),
-		Rule:      plan.Rule.ValueString(),
+		Rule:      json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
