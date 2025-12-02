@@ -60,8 +60,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 }
 
 func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
+		resp.Diagnostics.AddError(
+			"Provider Not Configured",
+			"The provider has not been configured. Please ensure that you have set up the provider correctly.",
+		)
 		return
 	}
 

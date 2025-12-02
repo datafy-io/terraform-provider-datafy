@@ -52,8 +52,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 }
 
 func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
+		resp.Diagnostics.AddError(
+			"Provider Not Configured",
+			"The provider has not been configured. Please ensure that you have set up the provider correctly.",
+		)
 		return
 	}
 
