@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    hashicups = {
+    datafy = {
       source = "datafy-io/datafy"
     }
   }
