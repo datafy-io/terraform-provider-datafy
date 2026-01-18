@@ -1,10 +1,12 @@
-package account
+package autoscaling_rule
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -24,36 +26,42 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	Name            types.String `tfsdk:"name"`
-	Id              types.String `tfsdk:"id"`
-	ParentAccountId types.String `tfsdk:"parent_account_id"`
+	AccountId types.String         `tfsdk:"account_id"`
+	RuleId    types.String         `tfsdk:"rule_id"`
+	Active    types.Bool           `tfsdk:"active"`
+	Rule      jsontypes.Normalized `tfsdk:"rule"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_account"
+	resp.TypeName = req.ProviderTypeName + "_autoscaling_rule"
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Create a Datafy account",
+		Description: "Create a Datafy Autoscaling Rule",
 		Attributes: map[string]schema.Attribute{
-			"name": schema.StringAttribute{
-				Description: "The name of the Datafy account.",
+			"account_id": schema.StringAttribute{
+				Description: "The unique identifier of the Datafy account.",
+				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"rule_id": schema.StringAttribute{
+				Description: "The unique identifier of the Datafy Autoscaling Rule.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"active": schema.BoolAttribute{
+				Description: "Indicates whether the autoscaling rule is active or not.",
 				Required:    true,
 			},
-			"id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy account.",
-				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"parent_account_id": schema.StringAttribute{
-				Description: "The unique identifier of the parent Datafy account",
-				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
+			"rule": schema.StringAttribute{
+				CustomType:  jsontypes.NormalizedType{},
+				Description: "The autoscaling rule policy.",
+				Required:    true,
 			},
 		},
 	}
@@ -86,19 +94,24 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
-	car, err := r.client.CreateAccount(ctx, &datafy.CreateAccountRequest{
-		AccountName: plan.Name.ValueString(),
+	caarr, err := r.client.CreateAccountAutoscalingRule(ctx, &datafy.CreateAccountAutoscalingRuleRequest{
+		AccountId: plan.AccountId.ValueString(),
+		Active:    plan.Active.ValueBool(),
+		Rule:      json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error creating account",
-			"Could not create account: "+err.Error(),
+			"Error creating account autoscaling rule",
+			"Could not create account autoscaling rule: "+err.Error(),
 		)
 		return
 	}
 
-	plan.Id = types.StringValue(car.Account.AccountId)
-	plan.ParentAccountId = types.StringValue(car.Account.ParentAccountId)
+	plan.AccountId = types.StringValue(caarr.AutoscalingRule.AccountId)
+	plan.RuleId = types.StringValue(caarr.AutoscalingRule.RuleId)
+	plan.Active = types.BoolValue(caarr.AutoscalingRule.Active)
+	plan.Rule = jsontypes.NewNormalizedValue(string(caarr.AutoscalingRule.Rule))
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -110,19 +123,22 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 		return
 	}
 
-	gcr, err := r.client.GetAccount(ctx, &datafy.GetAccountRequest{
-		AccountId: state.Id.ValueString(),
+	gaarr, err := r.client.GetAccountAutoscalingRule(ctx, &datafy.GetAccountAutoscalingRuleRequest{
+		AccountId: state.AccountId.ValueString(),
+		RuleId:    state.RuleId.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error read account",
-			"Could not read account: "+err.Error(),
+			"Error read account autoscaling rule",
+			"Could not read account autoscaling rule: "+err.Error(),
 		)
 		return
 	}
 
-	state.Name = types.StringValue(gcr.Account.AccountName)
-	state.ParentAccountId = types.StringValue(gcr.Account.ParentAccountId)
+	state.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
+	state.RuleId = types.StringValue(gaarr.AutoscalingRule.RuleId)
+	state.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
+	state.Rule = jsontypes.NewNormalizedValue(string(gaarr.AutoscalingRule.Rule))
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
@@ -135,14 +151,16 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		return
 	}
 
-	_, err := r.client.UpdateAccount(ctx, &datafy.UpdateAccountRequest{
-		AccountId:   plan.Id.ValueString(),
-		AccountName: plan.Name.ValueString(),
+	_, err := r.client.UpdateAccountAutoscalingRule(ctx, &datafy.UpdateAccountAutoscalingRuleRequest{
+		AccountId: plan.AccountId.ValueString(),
+		RuleId:    plan.RuleId.ValueString(),
+		Active:    plan.Active.ValueBool(),
+		Rule:      json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error update account",
-			"Could not update account: "+err.Error(),
+			"Error update account autoscaling rule",
+			"Could not update account autoscaling rule: "+err.Error(),
 		)
 		return
 	}
@@ -158,13 +176,14 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp 
 		return
 	}
 
-	_, err := r.client.DeleteAccount(ctx, &datafy.DeleteAccountRequest{
-		AccountId: state.Id.ValueString(),
+	_, err := r.client.DeleteAccountAutoscalingRule(ctx, &datafy.DeleteAccountAutoscalingRuleRequest{
+		AccountId: state.AccountId.ValueString(),
+		RuleId:    state.RuleId.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error delete account",
-			"Could not delete account: "+err.Error(),
+			"Error delete account autoscaling rule",
+			"Could not delete account autoscaling rule: "+err.Error(),
 		)
 		return
 	}
