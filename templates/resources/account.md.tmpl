@@ -5,7 +5,7 @@ description: |-
   Manages a Datafy account. Accounts represent cloud environments within your organization.
 ---
 
-# datafy_account (Resource)
+# {{ .Name }} (Resource)
 
 Manages a Datafy account. Accounts are the primary organizational unit in Datafy and represent a cloud environment (e.g., production, staging, development) within your organization.
 
@@ -43,11 +43,3 @@ resource "datafy_token" "production" {
 ```
 
 {{ .SchemaMarkdown | trimspace }}
-
-## Import
-
-Accounts can be imported using the account ID:
-
-```shell
-terraform import datafy_account.example 79c406c5-7b64-43f2-ba76-9b01e74e3d90
-```

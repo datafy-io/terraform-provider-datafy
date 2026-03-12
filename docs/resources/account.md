@@ -57,11 +57,3 @@ resource "datafy_token" "production" {
 
 - `id` (String) The unique identifier of the Datafy account.
 - `parent_account_id` (String) The unique identifier of the parent Datafy account
-
-## Import
-
-Accounts can be imported using the account ID:
-
-```shell
-terraform import datafy_account.example 79c406c5-7b64-43f2-ba76-9b01e74e3d90
-```
