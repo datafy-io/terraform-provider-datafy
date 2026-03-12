@@ -35,7 +35,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Create a Datafy account",
+		Description: "Manages a Datafy account. Accounts are the top-level organizational unit in Datafy, used to group and manage AWS resources, IAM roles, tokens, and autoscaling rules. Each account is created as a child of your organization (parent account).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				Description: "The name of the Datafy account.",

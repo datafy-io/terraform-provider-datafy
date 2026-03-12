@@ -36,14 +36,15 @@ func (p *DatafyProvider) Metadata(ctx context.Context, req provider.MetadataRequ
 
 func (p *DatafyProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "The Datafy provider is used to manage Datafy accounts, IAM role associations, access tokens, and autoscaling rules. For more information, see the [Datafy documentation](https://docs.datafy.io).",
 		Attributes: map[string]schema.Attribute{
 			"token": schema.StringAttribute{
-				Description: "Datafy token. Can also be configured using the `DATAFY_TOKEN` environment variable.",
+				Description: "Datafy API token used for authentication. Can also be configured using the `DATAFY_TOKEN` environment variable. See [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) for instructions on creating a token.",
 				Optional:    true,
 				Sensitive:   true,
 			},
 			"endpoint": schema.StringAttribute{
-				Description: "Datafy endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.",
+				Description: "Datafy API endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.",
 				Optional:    true,
 			},
 		},

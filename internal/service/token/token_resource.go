@@ -47,7 +47,7 @@ func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConf
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Create a Datafy token, which represents an access token associated with a Datafy account.",
+		Description: "Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles. For instructions on token generation, see the [Datafy documentation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",

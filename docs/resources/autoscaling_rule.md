@@ -2,14 +2,14 @@
 page_title: "datafy_autoscaling_rule Resource - datafy"
 subcategory: ""
 description: |-
-  Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which instances are eligible for autoscaling within a Datafy account.
+  Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for autoscaling within a Datafy account.
 ---
 
 # datafy_autoscaling_rule (Resource)
 
-Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which instances are eligible for autoscaling within a Datafy account.
+Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for autoscaling within a Datafy account. For a general overview of autoscaling rules and the types of rules available, see the [Autoscaling Rules](https://docs.datafy.io/volume-lifecycle/autoscaling-rules) documentation.
 
-Rules use a JSON-based policy language (based on [JsonLogic](https://jsonlogic.com/)) to match instances by their attributes such as instance ID, tags, or other properties. Each account can have multiple rules, and rules can be individually activated or deactivated.
+Rules use a JSON-based policy language (based on [JsonLogic](https://jsonlogic.com/)) to match volumes by their attributes. Each account can have multiple rules, and rules can be individually activated or deactivated.
 
 Changing the `account_id` forces the rule to be destroyed and recreated.
 
@@ -26,68 +26,146 @@ resource "datafy_autoscaling_rule" "by_instance_id" {
   account_id = datafy_account.example.id
   active     = true
   rule = jsonencode({
-    "in" : [
-      { "var" : "instance_id" },
-      [
-        "i-1234567890abcdef0",
-        "i-0987654321fedcba0"
-      ]
+    "and" : [
+      {
+        "in" : [
+          { "var" : "instance_id" },
+          ["i-1234567890abcdef0", "i-0987654321fedcba0"]
+        ]
+      }
     ]
   })
 }
 ```
 
-### Rule matching instances by tags
+### Rule matching by cluster and node group
 
 ```terraform
-resource "datafy_autoscaling_rule" "by_tags" {
+resource "datafy_autoscaling_rule" "by_cluster" {
   account_id = datafy_account.example.id
   active     = true
   rule = jsonencode({
-    "some" : [
-      { "var" : "tags" },
-      { "in" : [
-        { "var" : "" },
-        [
-          "env:production",
-          "env:prod"
+    "and" : [
+      {
+        "in" : [
+          { "var" : "cluster_name" },
+          ["my-eks-cluster"]
         ]
-      ] }
+      },
+      {
+        "in" : [
+          { "var" : "node_group_name" },
+          ["worker-nodes-1", "worker-nodes-2"]
+        ]
+      }
     ]
   })
 }
 ```
 
-### Inactive rule (created but not enforced)
+### Rule matching volumes by volume tags
 
 ```terraform
-resource "datafy_autoscaling_rule" "draft" {
+resource "datafy_autoscaling_rule" "by_volume_tags" {
   account_id = datafy_account.example.id
-  active     = false
+  active     = true
   rule = jsonencode({
-    "in" : [
-      { "var" : "instance_id" },
-      ["i-1234567890abcdef0"]
+    "and" : [
+      {
+        "some" : [
+          { "var" : "tags" },
+          {
+            "in" : [
+              { "var" : "" },
+              ["env:production", "env:prod"]
+            ]
+          }
+        ]
+      }
     ]
   })
 }
 ```
 
-## Rule Policy Syntax
+### Rule matching by instance tags
 
-The `rule` attribute accepts a JSON object using [JsonLogic](https://jsonlogic.com/) syntax. The following variables are available for matching:
+```terraform
+resource "datafy_autoscaling_rule" "by_instance_tags" {
+  account_id = datafy_account.example.id
+  active     = true
+  rule = jsonencode({
+    "and" : [
+      {
+        "some" : [
+          { "var" : "instance_tags" },
+          {
+            "in" : [
+              { "var" : "" },
+              ["team:platform", "team:infra"]
+            ]
+          }
+        ]
+      }
+    ]
+  })
+}
+```
 
-- `instance_id` — The AWS EC2 instance ID (e.g., `"i-1234567890abcdef0"`)
-- `tags` — A list of instance tags in `key:value` format (e.g., `["env:production", "team:platform"]`)
+### Combined rule with multiple conditions
 
-Common operations:
+```terraform
+resource "datafy_autoscaling_rule" "combined" {
+  account_id = datafy_account.example.id
+  active     = true
+  rule = jsonencode({
+    "and" : [
+      {
+        "in" : [
+          { "var" : "cluster_name" },
+          ["production-cluster"]
+        ]
+      },
+      {
+        "some" : [
+          { "var" : "tags" },
+          {
+            "in" : [
+              { "var" : "" },
+              ["env:production"]
+            ]
+          }
+        ]
+      }
+    ]
+  })
+}
+```
 
-| Operation | Description | Example |
-|-----------|-------------|---------|
-| `in` | Check if a value is in a list | `{"in": [{"var": "instance_id"}, ["i-123", "i-456"]]}` |
-| `some` | Check if any element in an array matches | `{"some": [{"var": "tags"}, {"in": [{"var": ""}, ["env:prod"]]}]}` |
+## Rule Policy
 
-For the full syntax reference, see the [Datafy documentation](https://docs.datafy.io).
+The `rule` attribute accepts a JSON object using [JsonLogic](https://jsonlogic.com/) syntax. Rules must use `and` as the top-level operator when combining multiple conditions.
+
+### Available Parameters
+
+The following parameters can be used in rule conditions via `{"var": "<parameter_name>"}`:
+
+| Parameter | Description | Type | Example Values |
+|-----------|-------------|------|----------------|
+| `instance_id` | The AWS EC2 instance ID | Single value | `"i-1234567890abcdef0"` |
+| `cluster_name` | The Kubernetes cluster name | Single value | `"my-eks-cluster"` |
+| `node_group_name` | The Kubernetes node group name | Single value | `"worker-nodes-1"` |
+| `tags` | Volume tags in `key:value` format | Array | `["env:production", "team:platform"]` |
+| `instance_tags` | EC2 instance tags in `key:value` format | Array | `["role:worker", "env:prod"]` |
+
+### Supported Operators
+
+- **`in`** — Check if a single-value parameter matches one of the listed values. Used with `instance_id`, `cluster_name`, and `node_group_name`.
+- **`some`** — Check if any element in an array parameter matches. Used with `tags` and `instance_tags`.
+- **`none`** — Check if no element in an array parameter matches. Used with `tags` and `instance_tags`.
+- **`!`** — Negate a condition (e.g., `{"!": {"in": [...]}}`).
+- **`and`** — Combine multiple conditions (required as top-level operator for multi-condition rules).
+
+~> The API returns informative validation errors if the rule syntax is incorrect. Each parameter can only appear once in an `and` operation (except `tags` and `instance_tags`).
 
 <!-- schema generated by tfplugindocs -->
 ## Schema
@@ -96,7 +174,7 @@ For the full syntax reference, see the [Datafy documentation](https://docs.dataf
 
 - `account_id` (String) The unique identifier of the Datafy account. Changing this forces a new rule to be created.
 - `active` (Boolean) Whether the autoscaling rule is currently active. When `false`, the rule exists but is not enforced.
-- `rule` (String) The autoscaling rule policy as a JSON string. Must be a valid JsonLogic expression. Use `jsonencode()` to construct the value.
+- `rule` (String) The autoscaling rule policy as a JSON string using JsonLogic syntax. The rule defines conditions for matching volumes based on available parameters: `instance_id` (EC2 instance ID), `node_group_name` (Kubernetes node group name), `cluster_name` (cluster name), `tags` (volume tags in key:value format), and `instance_tags` (EC2 instance tags in key:value format). Use `jsonencode()` to construct the value.
 
 ### Read-Only
 

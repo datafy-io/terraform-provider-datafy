@@ -9,7 +9,7 @@ description: |-
 
 Manages the AWS IAM role ARN associated with a Datafy account. This role grants Datafy permission to access and manage AWS resources on your behalf.
 
-Each Datafy account can have one AWS IAM role associated with it. The IAM role must be created in your AWS account with a trust policy that allows Datafy to assume it. See the [Datafy documentation](https://docs.datafy.io) for instructions on creating the required IAM role and trust policy.
+Each Datafy account can have one AWS IAM role associated with it. The IAM role must be created in your AWS account with a trust policy that allows Datafy to assume it. See the [Permissions Configuration](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration) guide for instructions on creating the required IAM role and trust policy.
 
 ## Example Usage
 

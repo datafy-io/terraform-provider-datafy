@@ -7,7 +7,7 @@ description: |-
 
 # datafy_autoscaling_rule (Data Source)
 
-Use this data source to retrieve information about an existing Datafy autoscaling rule. This is useful when you need to reference a rule that was created outside of Terraform or in a different Terraform configuration.
+Use this data source to retrieve information about an existing Datafy autoscaling rule. This is useful when you need to reference a rule that was created outside of Terraform or in a different Terraform configuration. For more information about autoscaling rules, see the [Autoscaling Rules](https://docs.datafy.io/volume-lifecycle/autoscaling-rules) documentation.
 
 ## Example Usage
 

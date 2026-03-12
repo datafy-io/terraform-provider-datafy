@@ -7,7 +7,7 @@ description: |-
 
 # datafy_token (Resource)
 
-Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles.
+Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles. For instructions on token generation, see the [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) guide.
 
 Tokens are immutable after creation — changing the `account_id`, `description`, `ttl`, or `role_ids` will destroy and recreate the token. The `secret` value is only available at creation time and is stored in Terraform state. Handle it carefully and consider using `sensitive` output values.
 

@@ -12,7 +12,8 @@ The Datafy provider allows you to manage resources in your [Datafy](https://docs
 ## Prerequisites
 
 - A Datafy organization account. Sign up at [datafy.io](https://docs.datafy.io) if you don't have one.
-- A Datafy API token. You can generate one from the Datafy UI under your account settings.
+- A Datafy API token. See the [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) guide for instructions.
+- An AWS IAM role configured with the required permissions. See the [Permissions Configuration](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration) guide.
 
 ## Authentication
 
@@ -77,4 +78,4 @@ resource "datafy_token" "example" {
 ### Optional
 
 - `endpoint` (String) Datafy API endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.
-- `token` (String, Sensitive) Datafy API token used for authentication. Can also be configured using the `DATAFY_TOKEN` environment variable.
+- `token` (String, Sensitive) Datafy API token used for authentication. Can also be configured using the `DATAFY_TOKEN` environment variable. See [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) for instructions on creating a token.
