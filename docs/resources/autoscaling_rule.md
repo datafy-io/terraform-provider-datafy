@@ -2,12 +2,12 @@
 page_title: "datafy_autoscaling_rule Resource - datafy"
 subcategory: ""
 description: |-
-  Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for autoscaling within a Datafy account.
+  Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for automatic autoscaling within a Datafy account.
 ---
 
 # datafy_autoscaling_rule (Resource)
 
-Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for autoscaling within a Datafy account. For a general overview of autoscaling rules and the types of rules available, see the [Autoscaling Rules](https://docs.datafy.io/volume-lifecycle/autoscaling-rules) documentation.
+Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for automatic autoscaling within a Datafy account. For a general overview of autoscaling rules and the types of rules available, see the [Autoscaling Rules](https://docs.datafy.io/volume-lifecycle/autoscaling-rules) documentation.
 
 Rules use a JSON-based policy language (based on [JsonLogic](https://jsonlogic.com/)) to match volumes by their attributes. Each account can have multiple rules, and rules can be individually activated or deactivated.
 

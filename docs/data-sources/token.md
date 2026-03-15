@@ -7,7 +7,7 @@ description: |-
 
 # datafy_token (Data Source)
 
-Use this data source to retrieve information about an existing Datafy access token. Note that the token secret is not available through the data source — it is only returned at creation time via the `datafy_token` resource.
+Use this data source to retrieve information about an existing Datafy access token. Note that the token secret is not available through this data source — the secret is only exposed once, when the token is first created using the `datafy_token` resource, and cannot be retrieved afterward.
 
 ## Example Usage
 

@@ -45,7 +45,7 @@ resource "datafy_token" "staging_ci" {
 
 ### Required
 
-- `name` (String) The display name of the Datafy account. Must be unique within your organization.
+- `name` (String) The display name of the Datafy account.
 
 ### Read-Only
 
