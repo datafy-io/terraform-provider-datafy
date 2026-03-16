@@ -8,8 +8,9 @@ import (
 )
 
 type CreateAccountRoleArnRequest struct {
-	AccountId string
-	Arn       string
+	AccountId      string
+	Arn            string
+	SkipValidation bool
 }
 
 type CreateAccountRoleArnResponse struct {
@@ -25,8 +26,9 @@ type GetAccountRoleArnResponse struct {
 }
 
 type UpdateAccountRoleArnRequest struct {
-	AccountId string
-	Arn       string
+	AccountId      string
+	Arn            string
+	SkipValidation bool
 }
 
 type UpdateAccountRoleArnResponse struct {
@@ -45,9 +47,13 @@ type AccountRoleArn struct {
 }
 
 func (c *Client) CreateAccountRoleArn(ctx context.Context, req *CreateAccountRoleArnRequest) (*CreateAccountRoleArnResponse, error) {
-	resp, err := c.callAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/accounts/%s/role-arn", req.AccountId), map[string]interface{}{
+	body := map[string]interface{}{
 		"roleArn": req.Arn,
-	})
+	}
+	if req.SkipValidation {
+		body["skipValidation"] = true
+	}
+	resp, err := c.callAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/accounts/%s/role-arn", req.AccountId), body)
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +96,9 @@ func (c *Client) GetAccountRoleArn(ctx context.Context, req *GetAccountRoleArnRe
 
 func (c *Client) UpdateAccountRoleArn(ctx context.Context, req *UpdateAccountRoleArnRequest) (*UpdateAccountRoleArnResponse, error) {
 	res, err := c.CreateAccountRoleArn(ctx, &CreateAccountRoleArnRequest{
-		AccountId: req.AccountId,
-		Arn:       req.Arn,
+		AccountId:      req.AccountId,
+		Arn:            req.Arn,
+		SkipValidation: req.SkipValidation,
 	})
 	if err != nil {
 		return nil, err

@@ -22,8 +22,9 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	AccountId types.String `tfsdk:"account_id"`
-	Arn       types.String `tfsdk:"arn"`
+	AccountId      types.String `tfsdk:"account_id"`
+	Arn            types.String `tfsdk:"arn"`
+	SkipValidation types.Bool   `tfsdk:"skip_validation"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -41,6 +42,10 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"arn": schema.StringAttribute{
 				Description: "The Amazon Resource Name (ARN) of the IAM role.",
 				Required:    true,
+			},
+			"skip_validation": schema.BoolAttribute{
+				Description: "Skip IAM role permission validation. When true, the role ARN will be saved without verifying that the role has the required permissions. Defaults to false.",
+				Optional:    true,
 			},
 		},
 	}
@@ -74,8 +79,9 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	}
 
 	_, err := r.client.CreateAccountRoleArn(ctx, &datafy.CreateAccountRoleArnRequest{
-		AccountId: plan.AccountId.ValueString(),
-		Arn:       plan.Arn.ValueString(),
+		AccountId:      plan.AccountId.ValueString(),
+		Arn:            plan.Arn.ValueString(),
+		SkipValidation: plan.SkipValidation.ValueBool(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -121,8 +127,9 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 	}
 
 	_, err := r.client.UpdateAccountRoleArn(ctx, &datafy.UpdateAccountRoleArnRequest{
-		AccountId: plan.AccountId.ValueString(),
-		Arn:       plan.Arn.ValueString(),
+		AccountId:      plan.AccountId.ValueString(),
+		Arn:            plan.Arn.ValueString(),
+		SkipValidation: plan.SkipValidation.ValueBool(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
