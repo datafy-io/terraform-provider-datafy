@@ -61,3 +61,7 @@ resource "datafy_role_arn" "example" {
 
 - `account_id` (String) The unique identifier of the Datafy account to associate the IAM role with.
 - `arn` (String) The Amazon Resource Name (ARN) of the IAM role that Datafy will assume. Must be a valid IAM role ARN in the format `arn:aws:iam::<account-id>:role/<role-name>`.
+
+### Optional
+
+- `skip_validation` (Boolean) Skip IAM role permission validation. When set to `true`, the role ARN will be saved without verifying that the role has the required permissions. Defaults to `false`.
