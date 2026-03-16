@@ -1,0 +1,16 @@
+---
+page_title: "datafy_autoscaling_rule Data Source - datafy"
+subcategory: ""
+description: |-
+  Retrieves information about an existing Datafy autoscaling rule.
+---
+
+# {{ .Name }} (Data Source)
+
+Use this data source to retrieve information about an existing Datafy autoscaling rule. This is useful when you need to reference a rule that was created outside of Terraform or in a different Terraform configuration.
+
+## Example Usage
+
+{{ tffile "examples/data-sources/datafy_autoscaling_rule/data-source.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}

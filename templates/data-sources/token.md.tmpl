@@ -1,0 +1,16 @@
+---
+page_title: "datafy_token Data Source - datafy"
+subcategory: ""
+description: |-
+  Retrieves information about an existing Datafy access token.
+---
+
+# {{ .Name }} (Data Source)
+
+Use this data source to retrieve information about an existing Datafy access token. This returns metadata about the token (description, role IDs, expiration) but **not** the token secret.
+
+## Example Usage
+
+{{ tffile "examples/data-sources/datafy_token/data-source.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
