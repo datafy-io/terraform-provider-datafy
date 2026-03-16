@@ -33,7 +33,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages a Datafy role ARN, which represents an AWS IAM role associated with a Datafy account.",
+		Description: "Manages the AWS IAM role ARN associated with a Datafy account. This role grants Datafy permission to access and manage AWS resources on your behalf. For information about required permissions, see the [Datafy documentation](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",

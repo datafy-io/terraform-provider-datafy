@@ -38,7 +38,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Create a Datafy Autoscaling Rule",
+		Description: "Manages a Datafy autoscaling rule. Autoscaling rules define policies that control which volumes are eligible for autoscaling within a Datafy account. For more information about autoscaling rules, see the [Datafy documentation](https://docs.datafy.io/volume-lifecycle/autoscaling-rules).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
@@ -55,12 +55,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"active": schema.BoolAttribute{
-				Description: "Indicates whether the autoscaling rule is active or not.",
+				Description: "Whether the autoscaling rule is currently active. When set to false, the rule exists but is not enforced.",
 				Required:    true,
 			},
 			"rule": schema.StringAttribute{
 				CustomType:  jsontypes.NormalizedType{},
-				Description: "The autoscaling rule policy.",
+				Description: "The autoscaling rule policy as a JSON string using JsonLogic syntax. The rule defines conditions for matching volumes based on available parameters: `instance_id` (EC2 instance ID), `node_group_name` (Kubernetes node group name), `cluster_name` (cluster name), `tags` (volume tags in key:value format), and `instance_tags` (EC2 instance tags in key:value format). Use `jsonencode()` to construct the value.",
 				Required:    true,
 			},
 		},

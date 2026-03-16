@@ -35,7 +35,7 @@ func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataReques
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Retrieves a specific Datafy Autoscaling Rule.",
+		Description: "Use this data source to retrieve information about an existing Datafy autoscaling rule. For more information about autoscaling rules, see the [Datafy documentation](https://docs.datafy.io/volume-lifecycle/autoscaling-rules).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
 				Description: "The unique identifier of the Datafy account.",
