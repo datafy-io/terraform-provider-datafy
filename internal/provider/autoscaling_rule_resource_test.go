@@ -1,9 +1,13 @@
 package provider_test
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
+	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccAutoscalingRuleResource_basic(t *testing.T) {
@@ -11,6 +15,7 @@ func TestAccAutoscalingRuleResource_basic(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckAutoscalingRuleDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAutoscalingRuleResourceConfig(true),
@@ -29,6 +34,7 @@ func TestAccAutoscalingRuleResource_update(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckAutoscalingRuleDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAutoscalingRuleResourceConfig(true),
@@ -45,6 +51,26 @@ func TestAccAutoscalingRuleResource_update(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccCheckAutoscalingRuleDestroy(s *terraform.State) error {
+	client := newTestClient()
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "datafy_autoscaling_rule" {
+			continue
+		}
+
+		_, err := client.GetAccountAutoscalingRule(context.Background(), &datafy.GetAccountAutoscalingRuleRequest{
+			AccountId: rs.Primary.Attributes["account_id"],
+			RuleId:    rs.Primary.Attributes["rule_id"],
+		})
+		if err == nil {
+			return fmt.Errorf("autoscaling_rule %s still exists after destroy", rs.Primary.Attributes["rule_id"])
+		}
+	}
+
+	return nil
 }
 
 func testAccAutoscalingRuleResourceConfig(active bool) string {

@@ -1,10 +1,13 @@
 package provider_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
+	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccTokenResource_basic(t *testing.T) {
@@ -12,6 +15,7 @@ func TestAccTokenResource_basic(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckTokenDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTokenResourceConfig("regression-test-token", "60m"),
@@ -34,6 +38,7 @@ func TestAccTokenResource_noTTL(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckTokenDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTokenResourceConfigNoTTL("regression-test-token-no-ttl"),
@@ -45,6 +50,26 @@ func TestAccTokenResource_noTTL(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccCheckTokenDestroy(s *terraform.State) error {
+	client := newTestClient()
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "datafy_token" {
+			continue
+		}
+
+		_, err := client.GetAccountToken(context.Background(), &datafy.GetAccountTokenRequest{
+			AccountId: rs.Primary.Attributes["account_id"],
+			TokenId:   rs.Primary.Attributes["token_id"],
+		})
+		if err == nil {
+			return fmt.Errorf("token %s still exists after destroy", rs.Primary.Attributes["token_id"])
+		}
+	}
+
+	return nil
 }
 
 func testAccTokenResourceConfig(description, ttl string) string {
