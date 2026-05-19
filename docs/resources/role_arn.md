@@ -65,3 +65,11 @@ resource "datafy_role_arn" "example" {
 ### Optional
 
 - `skip_validation` (Boolean) Skip IAM role permission validation. When set to `true`, the role ARN will be saved without verifying that the role has the required permissions. Defaults to `false`.
+
+## Import
+
+Existing role ARN associations can be imported using the Datafy account ID:
+
+```shell
+terraform import datafy_role_arn.example 79c406c5-7b64-43f2-ba76-9b01e74e3d90
+```

@@ -72,3 +72,13 @@ output "token_secret" {
 - `expires` (String) The timestamp when the token will expire, in RFC 3339 format. Empty if no TTL was set.
 - `secret` (String, Sensitive) The secret value of the token. This is only available at creation time and is stored in Terraform state. Treat this value as a sensitive credential.
 - `token_id` (String) The unique identifier of the token.
+
+## Import
+
+Existing tokens can be imported using a composite ID in the format `account_id:token_id`:
+
+```shell
+terraform import datafy_token.example 79c406c5-7b64-43f2-ba76-9b01e74e3d90:2f8c5c2e-1a3b-4d7f-9e91-3b8e6d8a1c45
+```
+
+Note: the `secret` attribute is only returned by the API at creation time, so it cannot be recovered via import.
