@@ -13,13 +13,12 @@ The Datafy provider allows you to manage resources in your [Datafy](https://docs
 
 - A Datafy organization account. Sign up at [datafy.io](https://docs.datafy.io) if you don't have one.
 - A Datafy API token. See the [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) guide for instructions.
-- An AWS IAM role configured with the required permissions. See the [Permissions Configuration](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration) guide.
 
 ## Authentication
 
 The provider requires an API token for authentication. You can provide the token in two ways:
 
-1. **Provider configuration** (not recommended for production — avoid committing tokens to version control):
+1. **Provider configuration** — pass the token directly in your Terraform configuration. This is convenient for local experimentation, but is not recommended for production: the token will appear in plain text in any committed `.tf` files or shared modules, which is a credential leak risk.
 
 ```terraform
 provider "datafy" {
@@ -27,14 +26,15 @@ provider "datafy" {
 }
 ```
 
-2. **Environment variable** (recommended):
+2. **Environment variable** (recommended) — set `DATAFY_TOKEN` in the environment where Terraform runs. This is the recommended approach for CI/CD pipelines and automation: the token is injected at runtime from your CI/CD secret store (e.g., GitHub Actions secrets, GitLab CI variables, AWS SSM, HashiCorp Vault) and never lands in your Terraform code or state files. It also lets you rotate the token without changing any `.tf` file.
 
 ```shell
 export DATAFY_TOKEN="your-api-token"
 ```
 
 ```terraform
-provider "datafy" {}
+provider "datafy" {
+}
 ```
 
 ## Example Usage
@@ -43,7 +43,8 @@ provider "datafy" {}
 terraform {
   required_providers {
     datafy = {
-      source = "datafy-io/datafy"
+      source  = "datafy-io/datafy"
+      version = "~> 1.1"
     }
   }
 }
@@ -77,5 +78,5 @@ resource "datafy_token" "example" {
 
 ### Optional
 
-- `endpoint` (String) Datafy API endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.
 - `token` (String, Sensitive) Datafy API token used for authentication. Can also be configured using the `DATAFY_TOKEN` environment variable. See [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) for instructions on creating a token.
+- `endpoint` (String) Datafy API endpoint. Can also be configured using the `DATAFY_ENDPOINT` environment variable. Defaults to `https://api.datafy.io`.

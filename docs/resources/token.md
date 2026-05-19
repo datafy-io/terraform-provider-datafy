@@ -11,6 +11,8 @@ Manages a Datafy access token. Tokens are used to authenticate API requests and 
 
 Tokens are immutable after creation — changing the `account_id`, `description`, `ttl`, or `role_ids` will destroy and recreate the token. The `secret` value is only available at creation time and is stored in Terraform state. Handle it carefully and consider using `sensitive` output values.
 
+**Note:** The `role_ids` values shown in the examples below are illustrative only. Role IDs are UUIDs assigned by Datafy — to obtain the role IDs for your organization, please contact [Datafy support](https://docs.datafy.io).
+
 ## Example Usage
 
 ### Token with expiration
@@ -24,7 +26,7 @@ resource "datafy_token" "ci_token" {
   account_id  = datafy_account.example.id
   description = "CI/CD pipeline token"
   ttl         = "24h"
-  role_ids    = ["admin"]
+  role_ids    = ["b8e1c3a4-7d2f-4e9b-9a1c-5f3e6d8a2b91"]
 }
 ```
 
@@ -34,7 +36,7 @@ resource "datafy_token" "ci_token" {
 resource "datafy_token" "service_token" {
   account_id  = datafy_account.example.id
   description = "Long-lived service token"
-  role_ids    = ["readonly"]
+  role_ids    = ["3c7d9f12-4a8b-4c5e-bc6d-8e2f1a9b3d47"]
 }
 ```
 
@@ -44,7 +46,7 @@ resource "datafy_token" "service_token" {
 resource "datafy_token" "example" {
   account_id  = datafy_account.example.id
   description = "Agent token"
-  role_ids    = ["admin"]
+  role_ids    = ["b8e1c3a4-7d2f-4e9b-9a1c-5f3e6d8a2b91"]
 }
 
 output "token_secret" {
