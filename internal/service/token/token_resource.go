@@ -3,10 +3,12 @@ package token
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
@@ -16,7 +18,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.ResourceWithConfigure = &Resource{}
+var (
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
+)
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -50,14 +55,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		Description: "Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles. For instructions on token generation, see the [Datafy documentation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy account.",
+				Description: "The unique identifier of the Datafy account. Changing this forces a new token to be created.",
 				Required:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"description": schema.StringAttribute{
-				Description: "A description of the token.",
+				Description: "A human-readable description of the token's purpose. Changing this forces a new token to be created.",
 				Optional:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -65,14 +70,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"ttl": schema.StringAttribute{
 				CustomType:  timetypes.GoDurationType{},
-				Description: "The expiration time of the token.",
+				Description: "Time-to-live for the token, specified as a Go duration string (e.g., `\"60m\"`, `\"24h\"`, `\"168h\"`). If omitted, the token does not expire. Changing this forces a new token to be created.",
 				Optional:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"role_ids": schema.ListAttribute{
-				Description: "A list of role IDs associated with the token.",
+				Description: "A list of role IDs to associate with the token. These roles determine what permissions the token grants. Changing this forces a new token to be created.",
 				ElementType: types.StringType,
 				Required:    true,
 				PlanModifiers: []planmodifier.List{
@@ -80,22 +85,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"secret": schema.StringAttribute{
-				Description: "The secret value of the token.",
+				Description: "The secret value of the token. This is only available at creation time and is stored in Terraform state. Treat this value as a sensitive credential.",
 				Computed:    true,
 				Sensitive:   true,
 			},
 			"token_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy token.",
+				Description: "The unique identifier of the token.",
 				Computed:    true,
 			},
 			"expires": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "The time when the token will expire.",
+				Description: "The timestamp when the token will expire, in RFC 3339 format. Empty if no TTL was set.",
 				Computed:    true,
 			},
 			"created_at": schema.StringAttribute{
 				CustomType:  timetypes.RFC3339Type{},
-				Description: "The time when the token was created.",
+				Description: "The timestamp when the token was created, in RFC 3339 format.",
 				Computed:    true,
 			},
 		},
@@ -203,6 +208,20 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+}
+
+func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	parts := strings.SplitN(req.ID, ":", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		resp.Diagnostics.AddError(
+			"Invalid Import ID",
+			fmt.Sprintf("Expected import ID in the format \"account_id:token_id\", got: %q", req.ID),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("account_id"), parts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("token_id"), parts[1])...)
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

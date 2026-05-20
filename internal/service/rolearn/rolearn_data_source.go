@@ -39,7 +39,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Required:    true,
 			},
 			"arn": schema.StringAttribute{
-				Description: "The Amazon Resource Name (ARN) of the IAM role.",
+				Description: "The Amazon Resource Name (ARN) of the IAM role associated with the account.",
 				Computed:    true,
 			},
 		},

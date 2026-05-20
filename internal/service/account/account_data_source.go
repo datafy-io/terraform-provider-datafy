@@ -36,15 +36,15 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 		Description: "Retrieves a specific Datafy account.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "The unique identifier of the account.",
+				Description: "The unique identifier of the Datafy account to look up.",
 				Required:    true,
 			},
 			"name": schema.StringAttribute{
-				Description: "The name of the account.",
+				Description: "The display name of the account.",
 				Computed:    true,
 			},
 			"parent_account_id": schema.StringAttribute{
-				Description: "The unique identifier of the parent account",
+				Description: "The unique identifier of the parent Datafy account.",
 				Computed:    true,
 			},
 		},

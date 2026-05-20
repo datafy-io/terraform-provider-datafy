@@ -5,13 +5,17 @@ import (
 	"fmt"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.ResourceWithConfigure = &Resource{}
+var (
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
+)
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -36,15 +40,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		Description: "Manages the AWS IAM role ARN associated with a Datafy account. This role grants Datafy permission to access and manage AWS resources on your behalf. For information about required permissions, see the [Datafy documentation](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy account.",
+				Description: "The unique identifier of the Datafy account to associate the IAM role with.",
 				Required:    true,
 			},
 			"arn": schema.StringAttribute{
-				Description: "The Amazon Resource Name (ARN) of the IAM role.",
+				Description: "The Amazon Resource Name (ARN) of the IAM role that Datafy will assume. Must be a valid IAM role ARN in the format `arn:aws:iam::<account-id>:role/<role-name>`.",
 				Required:    true,
 			},
 			"skip_validation": schema.BoolAttribute{
-				Description: "Skip IAM role permission validation. When true, the role ARN will be saved without verifying that the role has the required permissions. Defaults to false.",
+				Description: "Skip IAM role permission validation. When set to `true`, the role ARN will be saved without verifying that the role has the required permissions. Defaults to `false`.",
 				Optional:    true,
 			},
 		},
@@ -140,6 +144,10 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+}
+
+func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("account_id"), req, resp)
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

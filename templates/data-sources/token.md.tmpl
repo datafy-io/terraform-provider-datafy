@@ -1,0 +1,25 @@
+---
+page_title: "datafy_token Data Source - datafy"
+subcategory: ""
+description: |-
+  Use this data source to retrieve information about an existing Datafy access token.
+---
+
+# datafy_token (Data Source)
+
+Use this data source to retrieve information about an existing Datafy access token. Note that the token secret is not available through this data source — the secret is only exposed once, when the token is first created using the `datafy_token` resource, and cannot be retrieved afterward.
+
+## Example Usage
+
+```terraform
+data "datafy_token" "example" {
+  account_id = "79c406c5-7b64-43f2-ba76-9b01e74e3d90"
+  token_id   = "7c4f5fcd-5a9c-4463-893a-9c2d09bf7bc6"
+}
+
+output "token_expiry" {
+  value = data.datafy_token.example.expires
+}
+```
+
+{{ .SchemaMarkdown | trimspace }}

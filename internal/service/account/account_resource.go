@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -13,7 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.ResourceWithConfigure = &Resource{}
+var (
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
+)
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -38,7 +42,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		Description: "Manages a Datafy account. Accounts are the top-level organizational unit in Datafy, used to group and manage AWS resources, IAM roles, tokens, and autoscaling rules. Each account is created as a child of your organization (parent account).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
-				Description: "The name of the Datafy account.",
+				Description: "The display name of the Datafy account.",
 				Required:    true,
 			},
 			"id": schema.StringAttribute{
@@ -49,7 +53,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"parent_account_id": schema.StringAttribute{
-				Description: "The unique identifier of the parent Datafy account",
+				Description: "The unique identifier of the parent Datafy account. This is your organization's root account.",
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -148,6 +152,10 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+}
+
+func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
