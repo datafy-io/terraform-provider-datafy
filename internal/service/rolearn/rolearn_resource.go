@@ -40,15 +40,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		Description: "Manages the AWS IAM role ARN associated with a Datafy account. This role grants Datafy permission to access and manage AWS resources on your behalf. For information about required permissions, see the [Datafy documentation](https://docs.datafy.io/set-up-and-installation/datafy-installation/permissions-configuration).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy account.",
+				Description: "The unique identifier of the Datafy account to associate the IAM role with.",
 				Required:    true,
 			},
 			"arn": schema.StringAttribute{
-				Description: "The Amazon Resource Name (ARN) of the IAM role.",
+				Description: "The Amazon Resource Name (ARN) of the IAM role that Datafy will assume. Must be a valid IAM role ARN in the format `arn:aws:iam::<account-id>:role/<role-name>`.",
 				Required:    true,
 			},
 			"skip_validation": schema.BoolAttribute{
-				Description: "Skip IAM role permission validation. When true, the role ARN will be saved without verifying that the role has the required permissions. Defaults to false.",
+				Description: "Skip IAM role permission validation. When set to `true`, the role ARN will be saved without verifying that the role has the required permissions. Defaults to `false`.",
 				Optional:    true,
 			},
 		},

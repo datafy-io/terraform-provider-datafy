@@ -38,12 +38,21 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 		Description: "Use this data source to retrieve information about an existing Datafy autoscaling rule. For more information about autoscaling rules, see the [Datafy documentation](https://docs.datafy.io/volume-lifecycle/autoscaling-rules).",
 		Attributes: map[string]schema.Attribute{
 			"account_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy account.",
+				Description: "The unique identifier of the Datafy account that owns the rule.",
 				Required:    true,
 			},
 			"rule_id": schema.StringAttribute{
-				Description: "The unique identifier of the Datafy Autoscaling Rule.",
+				Description: "The unique identifier of the autoscaling rule to look up.",
 				Required:    true,
+			},
+			"active": schema.BoolAttribute{
+				Description: "Whether the autoscaling rule is currently active.",
+				Computed:    true,
+			},
+			"rule": schema.StringAttribute{
+				CustomType:  jsontypes.NormalizedType{},
+				Description: "The autoscaling rule policy as a JSON string.",
+				Computed:    true,
 			},
 		},
 	}
