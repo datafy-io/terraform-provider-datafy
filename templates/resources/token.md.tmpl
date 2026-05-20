@@ -1,0 +1,68 @@
+---
+page_title: "datafy_token Resource - datafy"
+subcategory: ""
+description: |-
+  Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles.
+---
+
+# datafy_token (Resource)
+
+Manages a Datafy access token. Tokens are used to authenticate API requests and grant access to Datafy account resources based on assigned roles. For instructions on token generation, see the [Token Generation](https://docs.datafy.io/set-up-and-installation/datafy-installation/token-generation) guide.
+
+Tokens are immutable after creation — changing the `account_id`, `description`, `ttl`, or `role_ids` will destroy and recreate the token. The `secret` value is only available at creation time and is stored in Terraform state. Handle it carefully and consider using `sensitive` output values.
+
+**Note:** The `role_ids` values shown in the examples below are illustrative only. Role IDs are UUIDs assigned by Datafy — to obtain the role IDs for your organization, please contact [Datafy support](https://docs.datafy.io).
+
+## Example Usage
+
+### Token with expiration
+
+```terraform
+resource "datafy_account" "example" {
+  name = "my-account"
+}
+
+resource "datafy_token" "ci_token" {
+  account_id  = datafy_account.example.id
+  description = "CI/CD pipeline token"
+  ttl         = "24h"
+  role_ids    = ["b8e1c3a4-7d2f-4e9b-9a1c-5f3e6d8a2b91"]
+}
+```
+
+### Token without expiration
+
+```terraform
+resource "datafy_token" "service_token" {
+  account_id  = datafy_account.example.id
+  description = "Long-lived service token"
+  role_ids    = ["3c7d9f12-4a8b-4c5e-bc6d-8e2f1a9b3d47"]
+}
+```
+
+### Using the token secret
+
+```terraform
+resource "datafy_token" "example" {
+  account_id  = datafy_account.example.id
+  description = "Agent token"
+  role_ids    = ["b8e1c3a4-7d2f-4e9b-9a1c-5f3e6d8a2b91"]
+}
+
+output "token_secret" {
+  value     = datafy_token.example.secret
+  sensitive = true
+}
+```
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Import
+
+Existing tokens can be imported using a composite ID in the format `account_id:token_id`:
+
+```shell
+terraform import datafy_token.example 79c406c5-7b64-43f2-ba76-9b01e74e3d90:2f8c5c2e-1a3b-4d7f-9e91-3b8e6d8a1c45
+```
+
+Note: the `secret` attribute is only returned by the API at creation time, so it cannot be recovered via import.
