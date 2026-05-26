@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -42,6 +43,7 @@ type ResourceModel struct {
 	KmsKeyId         types.String `tfsdk:"kms_key_id"`
 	Tags             types.Map    `tfsdk:"tags"`
 	VolumeSizeGB     types.Int64  `tfsdk:"volume_size_gb"`
+	TargetVolumeIds  types.List   `tfsdk:"target_volume_ids"`
 }
 
 func (r *Resource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -123,6 +125,14 @@ func (r *Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *res
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
+			"target_volume_ids": schema.ListAttribute{
+				Description: "EBS volume IDs of the two underlying target volumes.",
+				Computed:    true,
+				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }
@@ -171,8 +181,18 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
+	targetIds := make([]attr.Value, len(result.TargetVolumeIds))
+	for i, id := range result.TargetVolumeIds {
+		targetIds[i] = types.StringValue(id)
+	}
+	targetList, diags := types.ListValue(types.StringType, targetIds)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	plan.Id = types.StringValue(result.VolumeId)
-	plan.VolumeSizeGB = types.Int64Value(int64(result.VolumeSizeGB))
+	plan.TargetVolumeIds = targetList
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 

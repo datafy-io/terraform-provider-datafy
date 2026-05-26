@@ -18,8 +18,8 @@ type CreateVolumeRequest struct {
 }
 
 type CreateVolumeResponse struct {
-	VolumeId     string `json:"volumeId"`
-	VolumeSizeGB int32  `json:"volumeSizeGB"`
+	VolumeId        string   `json:"volumeId"`
+	TargetVolumeIds []string `json:"targetVolumeIds"`
 }
 
 type volumeTag struct {
