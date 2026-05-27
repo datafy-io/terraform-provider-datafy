@@ -40,24 +40,33 @@ type getVolumesResponse struct {
 	Volumes []Volume `json:"volumes"`
 }
 
+type createVolumeBody struct {
+	VolumeProperties createVolumeProps `json:"volumeProperties"`
+}
+
+type createVolumeProps struct {
+	AvailabilityZone string      `json:"availabilityZone"`
+	DiskSize         int64       `json:"diskSize"`
+	VolumeIops       int64       `json:"volumeIops"`
+	VolumeThroughput int64       `json:"volumeThroughput"`
+	Encrypted        bool        `json:"encrypted"`
+	KmsKeyId         string      `json:"kmsKeyId,omitempty"`
+	Tags             []volumeTag `json:"tags,omitempty"`
+}
+
 func (c *Client) CreateVolume(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {
-	props := map[string]interface{}{
-		"availabilityZone": req.AvailabilityZone,
-		"diskSize":         req.DiskSize,
-		"volumeIops":       req.VolumeIops,
-		"volumeThroughput": req.VolumeThroughput,
-		"encrypted":        req.Encrypted,
-		"kmsKeyId":         req.KmsKeyId,
+	props := createVolumeProps{
+		AvailabilityZone: req.AvailabilityZone,
+		DiskSize:         req.DiskSize,
+		VolumeIops:       req.VolumeIops,
+		VolumeThroughput: req.VolumeThroughput,
+		Encrypted:        req.Encrypted,
+		KmsKeyId:         req.KmsKeyId,
 	}
-	if len(req.Tags) > 0 {
-		tags := make([]map[string]string, 0, len(req.Tags))
-		for k, v := range req.Tags {
-			tags = append(tags, map[string]string{"key": k, "value": v})
-		}
-		props["tags"] = tags
+	for k, v := range req.Tags {
+		props.Tags = append(props.Tags, volumeTag{Key: k, Value: v})
 	}
-	body := map[string]interface{}{"volumeProperties": props}
-	resp, err := c.callAPI(ctx, http.MethodPost, "/api/v1/volumes/create-datafied-volume", body)
+	resp, err := c.callAPI(ctx, http.MethodPost, "/api/v1/volumes/create-datafied-volume", createVolumeBody{VolumeProperties: props})
 	if err != nil {
 		return nil, err
 	}

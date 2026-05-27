@@ -30,7 +30,7 @@ func NewClient(token, endpoint string) *Client {
 	}
 }
 
-func (c *Client) callAPI(ctx context.Context, method, path string, body map[string]interface{}) (*http.Response, error) {
+func (c *Client) callAPI(ctx context.Context, method, path string, body any) (*http.Response, error) {
 	var reqBody io.Reader
 	if body != nil {
 		jsonData, err := json.Marshal(body)

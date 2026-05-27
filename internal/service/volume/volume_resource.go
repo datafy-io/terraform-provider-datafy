@@ -181,11 +181,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
-	targetIds := make([]attr.Value, len(result.TargetVolumeIds))
-	for i, id := range result.TargetVolumeIds {
-		targetIds[i] = types.StringValue(id)
-	}
-	targetList, diags := types.ListValue(types.StringType, targetIds)
+	targetList, diags := types.ListValueFrom(ctx, types.StringType, result.TargetVolumeIds)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
