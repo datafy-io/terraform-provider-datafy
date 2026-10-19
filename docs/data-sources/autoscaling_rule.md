@@ -37,4 +37,6 @@ output "rule_policy" {
 ### Read-Only
 
 - `active` (Boolean) Whether the autoscaling rule is currently active.
+- `description` (String) The description of the autoscaling rule.
+- `name` (String) The display name of the autoscaling rule.
 - `rule` (String) The autoscaling rule policy as a JSON string.

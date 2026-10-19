@@ -11,6 +11,8 @@ Manages a Datafy autoscaling rule. Autoscaling rules define policies that contro
 
 Rules use a JSON-based policy language (based on [JsonLogic](https://jsonlogic.com/)) to match volumes by their attributes. Each account can have multiple rules, and rules can be individually activated or deactivated.
 
+Each rule requires a `name` and can have an optional `description`. Neither has to be unique.
+
 Changing the `account_id` forces the rule to be destroyed and recreated.
 
 ## Example Usage
@@ -24,6 +26,7 @@ resource "datafy_account" "example" {
 
 resource "datafy_autoscaling_rule" "by_instance_id" {
   account_id = datafy_account.example.id
+  name       = "By instance ID"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -43,6 +46,7 @@ resource "datafy_autoscaling_rule" "by_instance_id" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_cluster" {
   account_id = datafy_account.example.id
+  name       = "By cluster and node group"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -68,6 +72,7 @@ resource "datafy_autoscaling_rule" "by_cluster" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_volume_tags" {
   account_id = datafy_account.example.id
+  name       = "By volume tags"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -92,6 +97,7 @@ resource "datafy_autoscaling_rule" "by_volume_tags" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_instance_tags" {
   account_id = datafy_account.example.id
+  name       = "By instance tags"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -116,6 +122,7 @@ resource "datafy_autoscaling_rule" "by_instance_tags" {
 ```terraform
 resource "datafy_autoscaling_rule" "combined" {
   account_id = datafy_account.example.id
+  name       = "Combined conditions"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -174,7 +181,12 @@ The following parameters can be used in rule conditions via `{"var": "<parameter
 
 - `account_id` (String) The unique identifier of the Datafy account. Changing this forces a new rule to be created.
 - `active` (Boolean) Whether the autoscaling rule is currently active. When `false`, the rule exists but is not enforced.
+- `name` (String) A display name for the rule. Does not have to be unique.
 - `rule` (String) The autoscaling rule policy as a JSON string using JsonLogic syntax. The rule defines conditions for matching volumes based on available parameters: `instance_id` (EC2 instance ID), `node_group_name` (Kubernetes node group name), `cluster_name` (cluster name), `tags` (volume tags in key:value format), and `instance_tags` (EC2 instance tags in key:value format). Use `jsonencode()` to construct the value.
+
+### Optional
+
+- `description` (String) A free-text description of the rule. When omitted, an existing description is left unchanged; set it to an empty string to clear it.
 
 ### Read-Only
 
