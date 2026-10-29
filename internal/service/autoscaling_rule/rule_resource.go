@@ -4,15 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/datafy-io/terraform-provider-datafy/internal/datafy"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -31,10 +34,12 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	AccountId types.String         `tfsdk:"account_id"`
-	RuleId    types.String         `tfsdk:"rule_id"`
-	Active    types.Bool           `tfsdk:"active"`
-	Rule      jsontypes.Normalized `tfsdk:"rule"`
+	AccountId   types.String         `tfsdk:"account_id"`
+	RuleId      types.String         `tfsdk:"rule_id"`
+	Name        types.String         `tfsdk:"name"`
+	Description types.String         `tfsdk:"description"`
+	Active      types.Bool           `tfsdk:"active"`
+	Rule        jsontypes.Normalized `tfsdk:"rule"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -54,6 +59,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"rule_id": schema.StringAttribute{
 				Description: "The unique identifier of the autoscaling rule.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"name": schema.StringAttribute{
+				Description: "A display name for the rule. Does not have to be unique.",
+				Required:    true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 128),
+					stringvalidator.RegexMatches(regexp.MustCompile(`\S`), "must not be blank"),
+				},
+			},
+			"description": schema.StringAttribute{
+				Description: "A free-text description of the rule. When omitted, an existing description is left unchanged; set it to an empty string to clear it.",
+				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -100,9 +121,11 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 	}
 
 	caarr, err := r.client.CreateAccountAutoscalingRule(ctx, &datafy.CreateAccountAutoscalingRuleRequest{
-		AccountId: plan.AccountId.ValueString(),
-		Active:    plan.Active.ValueBool(),
-		Rule:      json.RawMessage(plan.Rule.ValueString()),
+		AccountId:   plan.AccountId.ValueString(),
+		Name:        plan.Name.ValueString(),
+		Description: plan.Description.ValueString(),
+		Active:      plan.Active.ValueBool(),
+		Rule:        json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -114,6 +137,8 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 
 	plan.AccountId = types.StringValue(caarr.AutoscalingRule.AccountId)
 	plan.RuleId = types.StringValue(caarr.AutoscalingRule.RuleId)
+	plan.Name = types.StringValue(caarr.AutoscalingRule.Name)
+	plan.Description = types.StringValue(caarr.AutoscalingRule.Description)
 	plan.Active = types.BoolValue(caarr.AutoscalingRule.Active)
 	plan.Rule = jsontypes.NewNormalizedValue(string(caarr.AutoscalingRule.Rule))
 
@@ -142,6 +167,8 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 	state.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
 	state.RuleId = types.StringValue(gaarr.AutoscalingRule.RuleId)
+	state.Name = types.StringValue(gaarr.AutoscalingRule.Name)
+	state.Description = types.StringValue(gaarr.AutoscalingRule.Description)
 	state.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
 	state.Rule = jsontypes.NewNormalizedValue(string(gaarr.AutoscalingRule.Rule))
 
@@ -156,11 +183,13 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		return
 	}
 
-	_, err := r.client.UpdateAccountAutoscalingRule(ctx, &datafy.UpdateAccountAutoscalingRuleRequest{
-		AccountId: plan.AccountId.ValueString(),
-		RuleId:    plan.RuleId.ValueString(),
-		Active:    plan.Active.ValueBool(),
-		Rule:      json.RawMessage(plan.Rule.ValueString()),
+	uaarr, err := r.client.UpdateAccountAutoscalingRule(ctx, &datafy.UpdateAccountAutoscalingRuleRequest{
+		AccountId:   plan.AccountId.ValueString(),
+		RuleId:      plan.RuleId.ValueString(),
+		Name:        plan.Name.ValueString(),
+		Description: plan.Description.ValueString(),
+		Active:      plan.Active.ValueBool(),
+		Rule:        json.RawMessage(plan.Rule.ValueString()),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -169,6 +198,9 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 		)
 		return
 	}
+
+	plan.Name = types.StringValue(uaarr.AutoscalingRule.Name)
+	plan.Description = types.StringValue(uaarr.AutoscalingRule.Description)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }

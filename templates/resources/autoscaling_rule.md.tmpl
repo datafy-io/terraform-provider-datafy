@@ -11,6 +11,8 @@ Manages a Datafy autoscaling rule. Autoscaling rules define policies that contro
 
 Rules use a JSON-based policy language (based on [JsonLogic](https://jsonlogic.com/)) to match volumes by their attributes. Each account can have multiple rules, and rules can be individually activated or deactivated.
 
+Each rule requires a `name` and can have an optional `description`. Neither has to be unique.
+
 Changing the `account_id` forces the rule to be destroyed and recreated.
 
 ## Example Usage
@@ -24,6 +26,7 @@ resource "datafy_account" "example" {
 
 resource "datafy_autoscaling_rule" "by_instance_id" {
   account_id = datafy_account.example.id
+  name       = "By instance ID"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -43,6 +46,7 @@ resource "datafy_autoscaling_rule" "by_instance_id" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_cluster" {
   account_id = datafy_account.example.id
+  name       = "By cluster and node group"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -68,6 +72,7 @@ resource "datafy_autoscaling_rule" "by_cluster" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_volume_tags" {
   account_id = datafy_account.example.id
+  name       = "By volume tags"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -92,6 +97,7 @@ resource "datafy_autoscaling_rule" "by_volume_tags" {
 ```terraform
 resource "datafy_autoscaling_rule" "by_instance_tags" {
   account_id = datafy_account.example.id
+  name       = "By instance tags"
   active     = true
   rule = jsonencode({
     "and" : [
@@ -116,6 +122,7 @@ resource "datafy_autoscaling_rule" "by_instance_tags" {
 ```terraform
 resource "datafy_autoscaling_rule" "combined" {
   account_id = datafy_account.example.id
+  name       = "Combined conditions"
   active     = true
   rule = jsonencode({
     "and" : [
