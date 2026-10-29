@@ -64,6 +64,10 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"name": schema.StringAttribute{
 				Description: "A display name for the rule. Does not have to be unique.",
 				Required:    true,
+				Validators: []validator.String{
+                   stringvalidator.LengthBetween(1, 128),
+                   stringvalidator.RegexMatches(regexp.MustCompile(`\S`), "must not be blank"),
+                 },
 			},
 			"description": schema.StringAttribute{
 				Description: "A free-text description of the rule. When omitted, an existing description is left unchanged; set it to an empty string to clear it.",
