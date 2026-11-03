@@ -23,10 +23,12 @@ type DataSource struct {
 }
 
 type DataSourceModel struct {
-	AccountId types.String         `tfsdk:"account_id"`
-	RuleId    types.String         `tfsdk:"rule_id"`
-	Active    types.Bool           `tfsdk:"active"`
-	Rule      jsontypes.Normalized `tfsdk:"rule"`
+	AccountId   types.String         `tfsdk:"account_id"`
+	RuleId      types.String         `tfsdk:"rule_id"`
+	Name        types.String         `tfsdk:"name"`
+	Description types.String         `tfsdk:"description"`
+	Active      types.Bool           `tfsdk:"active"`
+	Rule        jsontypes.Normalized `tfsdk:"rule"`
 }
 
 func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -44,6 +46,14 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"rule_id": schema.StringAttribute{
 				Description: "The unique identifier of the autoscaling rule to look up.",
 				Required:    true,
+			},
+			"name": schema.StringAttribute{
+				Description: "The display name of the autoscaling rule.",
+				Computed:    true,
+			},
+			"description": schema.StringAttribute{
+				Description: "The description of the autoscaling rule.",
+				Computed:    true,
 			},
 			"active": schema.BoolAttribute{
 				Description: "Whether the autoscaling rule is currently active.",
@@ -99,6 +109,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	plan.AccountId = types.StringValue(gaarr.AutoscalingRule.AccountId)
 	plan.RuleId = types.StringValue(gaarr.AutoscalingRule.RuleId)
+	plan.Name = types.StringValue(gaarr.AutoscalingRule.Name)
+	plan.Description = types.StringValue(gaarr.AutoscalingRule.Description)
 	plan.Active = types.BoolValue(gaarr.AutoscalingRule.Active)
 	plan.Rule = jsontypes.NewNormalizedValue(string(gaarr.AutoscalingRule.Rule))
 

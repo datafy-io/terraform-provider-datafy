@@ -23,6 +23,33 @@ func TestAccAutoscalingRuleResource_basic(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resourceName, "account_id"),
 					resource.TestCheckResourceAttrSet(resourceName, "rule_id"),
 					resource.TestCheckResourceAttr(resourceName, "active", "true"),
+					resource.TestCheckResourceAttr(resourceName, "name", "regression-test-rule"),
+					resource.TestCheckResourceAttr(resourceName, "description", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccAutoscalingRuleResource_nameAndDescription(t *testing.T) {
+	resourceName := "datafy_autoscaling_rule.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckAutoscalingRuleDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAutoscalingRuleResourceConfigNamed("prod volumes", "all production volumes"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "prod volumes"),
+					resource.TestCheckResourceAttr(resourceName, "description", "all production volumes"),
+				),
+			},
+			{
+				Config: testAccAutoscalingRuleResourceConfigNamed("renamed", ""),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "renamed"),
+					resource.TestCheckResourceAttr(resourceName, "description", ""),
 				),
 			},
 		},
@@ -85,6 +112,7 @@ resource "datafy_account" "test" {
 
 resource "datafy_autoscaling_rule" "test" {
   account_id = datafy_account.test.id
+  name       = "regression-test-rule"
   active     = ` + activeStr + `
   rule       = jsonencode({
     "in" = [
@@ -104,6 +132,7 @@ resource "datafy_account" "test" {
 
 resource "datafy_autoscaling_rule" "test" {
   account_id = datafy_account.test.id
+  name       = "regression-test-rule"
   active     = false
   rule       = jsonencode({
     "and" = [
@@ -119,6 +148,27 @@ resource "datafy_autoscaling_rule" "test" {
           ["regression-test-nodegroup"]
         ]
       }
+    ]
+  })
+}
+`
+}
+
+func testAccAutoscalingRuleResourceConfigNamed(name, description string) string {
+	return `
+resource "datafy_account" "test" {
+  name = "regression-test-rule"
+}
+
+resource "datafy_autoscaling_rule" "test" {
+  account_id  = datafy_account.test.id
+  name        = "` + name + `"
+  description = "` + description + `"
+  active      = true
+  rule        = jsonencode({
+    "in" = [
+      { "var" = "cluster_name" },
+      ["regression-test-cluster"]
     ]
   })
 }

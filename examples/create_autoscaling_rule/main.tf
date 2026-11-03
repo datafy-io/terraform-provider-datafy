@@ -16,6 +16,7 @@ resource "datafy_account" "example" {
 
 resource "datafy_autoscaling_rule" "example1" {
   account_id = datafy_account.example.id
+  name       = "Instances by ID"
   active     = false
   rule = jsonencode({
     "in" : [
@@ -30,6 +31,7 @@ resource "datafy_autoscaling_rule" "example1" {
 
 resource "datafy_autoscaling_rule" "example2" {
   account_id = datafy_account.example.id
+  name       = "Staging volumes"
   active     = true
   rule = jsonencode({
     "some" : [
